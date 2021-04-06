@@ -996,6 +996,38 @@ const getRandomName = () => {
   return `${person.name} ${person.surname}`;
 };
 
+const getRandomyear = () => {
+  return Math.floor(Math.random() * (2002 - 1920) + 1920);
+}
+
+const getRandomPhoneNumber = () => {
+  const number = `06-${Math.floor(Math.random() * 89999999 + 100000)}`
+  return number
+}
+
+const getRandomEmployee = (id) => {
+  const dentist = names[Math.floor(Math.random() * 250)]
+  const firstName = dentist.name.split(" ")[0]
+  return {
+    name: `${dentist.name} ${dentist.surname}`,
+    email: `${firstName.toLowerCase()}@tandartspraktijkbvt.nl`,
+    phone: getRandomPhoneNumber(),
+    id: id
+  }
+}
+
+const getRandomPatient = (id) => {
+  const patient = names[Math.floor(Math.random() * 250)]
+  const name = patient.name.split(" ").concat(patient.surname.split(" ")).join("")
+  return {
+    name: `${patient.name} ${patient.surname}`,
+    email: `${name.toLowerCase()}@gmail.com`,
+    phone: getRandomPhoneNumber(),
+    birthYear: getRandomyear(),
+    id: id
+  }
+}
+
 const getRandomTime = () => {
   let hour;
   while (true) {
@@ -1006,19 +1038,72 @@ const getRandomTime = () => {
   }
 };
 
-const getRandomDay = () => Math.floor(Math.random() * 28) + 1;
+const getRandomDay = () => {
+  const availableDays = [1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 22, 23, 24, 25, 26]
+  let day = availableDays[Math.floor(Math.random() * availableDays.length)];
+  return day;
+}
 
-const generateRandomAppointment = () => ({
-  day: getRandomDay(),
-  time: getRandomTime(),
-  patient: getRandomName(),
-  dentist: getRandomName(),
-  assistant: getRandomName(),
-});
+const generateRandomAppointment = (appointments, id, dentists, assistants, patients) => {
+  let day = getRandomDay();
+  let time = getRandomTime();
+  let freeDentists = dentists;
+  let freeAssistants = assistants;
+  const patient = patients[Math.floor(Math.random() * patients.length)];
+  const daysAppointments = appointments.filter(appointment => appointment.day === day)
+  if (daysAppointments.length > 0) {
+    const timeAppointments = daysAppointments.filter(appointment => appointment.time === time)
+    if (timeAppointments.length > 0) {
+      const busyDentists = timeAppointments.map(appointment => appointment.dentist)
+      freeDentists = dentists.filter(
+        function (e) {
+          return this.indexOf(e) < 0;
+        }, busyDentists
+      )
+      const busyAssistants = timeAppointments.map(appointment => appointment.assistant)
+      freeAssistants = assistants.filter(
+        function (e) {
+          return this.indexOf(e) < 0;
+        }, busyAssistants
+      )
+    }
+  }
+  const dentist = freeDentists[Math.floor(Math.random() * freeDentists.length)];
+  const appointment = {
+    day: day,
+    time: time,
+    patient: patient,
+    dentist: dentist,
+    id: id
+  }
+  const needsAssistant = Math.random() < 0.5;
+  if (needsAssistant) {
+    appointment.assistant = freeAssistants[Math.floor(Math.random() * freeAssistants.length)]
+  }
 
-const generateRandomAppointments = num =>
-  Array(num)
-    .fill(0)
-    .map(_ => generateRandomAppointment());
 
-export default generateRandomAppointments;
+  return appointment
+};
+
+const generateRandomAppointments = (num, dentistArray, assistantArray, patientArray) => {
+  const appointments = []
+  let id = 1
+  while (appointments.length < num) {
+    const newAppointment = generateRandomAppointment(appointments, id, dentistArray, assistantArray, patientArray);
+    id++;
+    if (newAppointment.dentist === undefined) {
+      continue;
+    }
+    appointments.push(newAppointment)
+  }
+  return appointments;
+}
+
+const sortAppointments = (appointments) => {
+  const copyAppointments = [...appointments]
+  const sortedAppointments = copyAppointments.sort((a, b) => a.day - b.day || a.time - b.time);
+  console.log(sortedAppointments)
+  return sortedAppointments
+}
+
+export { generateRandomAppointments, generateRandomAppointment, getRandomEmployee, getRandomPatient, sortAppointments };

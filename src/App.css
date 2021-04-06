@@ -33,3 +33,9 @@ a:visited {
   color: darksalmon;
   outline: none;
 }
+
+
+
+.cancelled {
+  background-color: lightcoral;
+}

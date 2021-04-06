@@ -4,12 +4,13 @@ import AppointmentInDay from "./AppointmentInDay";
 
 export default ({ appointments }) => {
   const appointmentsJSX = appointments.map(
-    ({ time, patient, dentist, assistant }, index) => (
+    ({ time, patient, dentist, assistant, cancelled }, index) => (
       <AppointmentInDay
         time={time}
-        patient={patient}
-        dentist={dentist}
+        patient={patient.name}
+        dentist={dentist.name}
         assistant={assistant}
+        cancelled={cancelled}
         key={index}
       />
     )

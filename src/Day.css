@@ -26,6 +26,11 @@
 }
 
 .dayview .dentist,
-.dayview .assistant {
+.dayview .assistant,
+.dayview .illDentist {
   padding: 10px;
+}
+
+.dayview .cancelled {
+    background-color: lightcoral;
 }
